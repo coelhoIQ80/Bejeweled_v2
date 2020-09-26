@@ -4,158 +4,188 @@ import java.util.Random;
 
 public class LogicaJogo {
 
-    int[][] tabuleiro;
-    private int[][] tabuleiroAuxiliar;
+    private int[][] tabuleiroJogo = new int[8][8];
 
-    public LogicaJogo() {
-        tabuleiro = new int[8][8];
-        tabuleiroAuxiliar = new int[8][8];
-        preencheTabuleiroTeste();  // para efeitos de teste, apenas;
-        imprimeTabuleiro("Tabuleiro inicial");
-        verificaRepeticoes();
-        imprimeTabuleiro("Tabuleiro inicial2");
-        copiaArrayAuxParaArrayOriginal(); //tabuleiro = tabuleiroAuxiliar;
-        imprimeTabuleiro("Tabuleiro após verificar repetições");
+    // Se quiser ver o método de verificação em ação, tire o comentário do println;
+    private boolean verificaSeEsteTipoTipaEAutorizado() {
+        // escrever aqui codigo de login, etc, etc, etc
+        // System.out.println("Estás a ser verificado!! Big brother is watching you!");
+
+        boolean resultadoDeVerificacao = true;
+        return resultadoDeVerificacao;
     }
 
-    public void copiaArrayAuxParaArrayOriginal() {
+    public void setTabuleiroJogo(int linha, int coluna, int tipoPeca) {
+        tabuleiroJogo[linha][coluna]=tipoPeca;
+    }
+    
+    // usamos um "getter" como exemplo de conceito de encapsulamento;
+    // objetivo: controlar acesso a dados privados (tabuleiroJogo, neste caso).
+    public int[][] getTabuleiroJogo() {
 
-        for (int i = 0; i < 8; i++) {
-            System.arraycopy(tabuleiroAuxiliar[i], 0, tabuleiro[i], 0, 8);
+        boolean esUmUtilizadorAutorizado = verificaSeEsteTipoTipaEAutorizado();
+
+        if (esUmUtilizadorAutorizado) {
+            return tabuleiroJogo;
+        } else {
+            System.out.println("És um candidato a Rui Pinto! Ainda tens de suar muito!");
+            return null;
         }
     }
 
-    private void preencheTabuleiroTeste() {
+    public void preencheTabuleiroDeTeste() {
 
-        int[][] tstTabuleiro = {
-            {1, 2, 3, 4, 5, 2, 1, 2},
-            {1, 1, 1, 7, 6, 1, 1, 1},
-            {1, 4, 5, 7, 7, 3, 1, 2},
-            {4, 5, 6, 7, 4, 1, 2, 3},
-            {5, 6, 7, 7, 7, 3, 3, 3},
-            {6, 7, 3, 7, 2, 3, 4, 5},
-            {6, 6, 6, 7, 3, 4, 5, 6},
-            {6, 1, 2, 7, 4, 5, 6, 7}
+        int tabuleiroJogoAux[][] = {
+            {7, 6, 3, 5, 3, 4, 1, 3},
+            {1, 3, 1, 4, 3, 3, 7, 7},
+            {1, 7, 4, 6, 5, 3, 3, 6},
+            {6, 3, 5, 1, 3, 3, 2, 7},
+            {7, 7, 4, 7, 5, 7, 1, 5},
+            {3, 2, 2, 2, 2, 2, 2, 2},
+            {5, 1, 6, 3, 2, 7, 6, 3},
+            {1, 7, 2, 6, 1, 4, 3, 7}
         };
 
-        tabuleiroAuxiliar = tstTabuleiro;
-        copiaArrayAuxParaArrayOriginal();
-
-    }
-
-    private void preencheTabuleiro() {
-
-        Random geradorNumeros = new Random();
-
-        for (int linha = 0; linha < 8; linha++) {
-            for (int coluna = 0; coluna < 8; coluna++) {
-                int pecaInicial = 1 + geradorNumeros.nextInt(7);
-                tabuleiro[linha][coluna] = pecaInicial;
-                tabuleiroAuxiliar[linha][coluna] = pecaInicial;
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                tabuleiroJogo[i][j] = tabuleiroJogoAux[i][j];
             }
         }
+
     }
 
-    private void imprimeTabuleiro() {
-        imprimeTabuleiro("");
-    }
+    
+    public void preencheTabuleiro() {
 
-    private void imprimeTabuleiro(String tituloImpressao) {
+        Random r = new Random();
 
-        System.out.println(tituloImpressao);
-        for (int linha = 0; linha < 8; linha++) {
-            for (int coluna = 0; coluna < 8; coluna++) {
-                System.out.print(" " + tabuleiro[linha][coluna]);
+        for (int j = 0; j < 8; j++) {
+            for (int i = 0; i < 8; i++) {
+                tabuleiroJogo[j][i] = r.nextInt(7) + 1;
             }
-            System.out.println("");
         }
-
-        System.out.println("Tabuleiro Auxiliar");
-        for (int linha = 0; linha < 8; linha++) {
-            for (int coluna = 0; coluna < 8; coluna++) {
-                System.out.print(" " + tabuleiroAuxiliar[linha][coluna]);
+        System.out.println("Tabuleiro Preenchido");
+    }
+    
+    public void mostraTabuleiro() {
+        
+        System.out.println("\n\n");
+        for (int j = 0; j < 8; j++) {
+            for (int i = 0; i < 8; i++) {
+                System.out.print(" " + tabuleiroJogo[j][i]);
             }
             System.out.println("");
         }
-
     }
 
-    public boolean verificaRepeticaoLinhas() {
+    public void detetarRepeticoes() {
+        detetarRepeticoesLinhas();
+        detetarRepeticoesColunas();
+    }
+    
+    private void detetarRepeticoesLinhas() {
+        
+        for (int j = 0; j < 8; j++) {  // linhas
+            for (int i = 0; i < 6; i++) {  // colunas
+                int salto = 0;
+                if (tabuleiroJogo[j][i] == tabuleiroJogo[j][i + 1]
+                        && tabuleiroJogo[j][i + 1] == tabuleiroJogo[j][i + 2]) {
+                    System.out.print("Detetada Repetição de 3 Peças");
+                    System.out.print(" na linha " + j + " e coluna " + i + "\n");
+                    salto = 3;
+                    if (i + 3 < 8 && tabuleiroJogo[j][i + 2] == tabuleiroJogo[j][i + 3]) {
+                        System.out.println("E ainda há uma quarta repetição");
+                        salto = 4;
+                        if (i + 4 < 8 && tabuleiroJogo[j][i + 3] == tabuleiroJogo[j][i + 4]) {
+                            System.out.println("E ainda há uma quinta repetição");
+                            salto = 5;
+                            if (i + 5 < 8 && tabuleiroJogo[j][i + 4] == tabuleiroJogo[j][i + 5]) {
+                                System.out.println("E ainda há uma sexta repetição");
+                                salto = 6;
+                                if (i + 6 < 8 && tabuleiroJogo[j][i + 5] == tabuleiroJogo[j][i + 6]) {
+                                    System.out.println("E ainda há uma setima repetição");
+                                    salto = 7;
+                                    if (i + 7 < 8 && tabuleiroJogo[j][i + 6] == tabuleiroJogo[j][i + 7]) {
+                                        System.out.println("E ainda há uma oitava repetição");
+                                        salto = 8;
+                                    }
 
-        boolean repeticaoEncontrada = false;
-        for (int coluna = 0; coluna < 8; coluna++) {
-            for (int linha = 0; linha < 6; linha++) {
-                
-                int contaRepeticoes = 0;
-                int linhaDeBaixo = linha + 1;
-                while (linhaDeBaixo <= 7 &&  tabuleiro[linha][coluna]
-                        == tabuleiro[linhaDeBaixo][coluna]) {
-                    linhaDeBaixo++;
-                    contaRepeticoes++;
+                                }
+                            }
+                        }
+                    }
                 }
-                // if (contaRepeticoes >= 2 && tabuleiroAuxiliar[linha][coluna] != 0) {
-                if (contaRepeticoes >= 2) {
-                    System.out.println("O numero "
-                            + tabuleiro[linha][coluna]
-                            + " repetiu-se " + contaRepeticoes + " vezes "
-                            + " na coluna " + coluna);
-                    apagaRepeticaoLinhas(coluna, linha, contaRepeticoes);
-                    linha += contaRepeticoes;
-                    repeticaoEncontrada = true;
-                }
+
+                // colocar 3+ zeros no local indicado por i,j ( o numero de zeros é dado pela variável "salto"
+                colocarZerosOndeHaviaRepeticoesLinhas(j,i,salto);
+                i += salto;
             }
         }
-        System.out.println("Repetição encontrada linhas=" + repeticaoEncontrada);
-        return repeticaoEncontrada;
     }
+    
+    private void detetarRepeticoesColunas() {
 
-    private void apagaRepeticaoLinhas(int coluna, int linha, int contaRepeticoes) {
+        for (int j = 0; j < 6; j++) {  // linhas
+            for (int i = 0; i < 8; i++) {  // colunas
+                int salto = 0;
+                if (tabuleiroJogo[j + 1][i] == tabuleiroJogo[j][i]
+                        && tabuleiroJogo[j + 1][i] == tabuleiroJogo[j+2][i]) {
+                    System.out.print("Detetada Repetição de 3 Peças");
+                    System.out.print(" na linha " + j + " e coluna " + i + "\n");
+                    salto = 3;
+                    if (i + 3 < 8 && tabuleiroJogo[j+2][i] == tabuleiroJogo[j+3][i]) {
+                        System.out.println("E ainda há uma quarta repetição");
+                        salto = 4;
+                        if (i + 4 < 8 && tabuleiroJogo[j+3][i] == tabuleiroJogo[j+3][i]) {
+                            System.out.println("E ainda há uma quinta repetição");
+                            salto = 5;
+                            if (i + 5 < 8 && tabuleiroJogo[j+4][i] == tabuleiroJogo[j+5][i]) {
+                                System.out.println("E ainda há uma sexta repetição");
+                                salto = 6;
+                                if (i + 6 < 8 && tabuleiroJogo[j+5][i] == tabuleiroJogo[j+6][i]) {
+                                    System.out.println("E ainda há uma setima repetição");
+                                    salto = 7;
+                                    if (i + 7 < 8 && tabuleiroJogo[j+6][i] == tabuleiroJogo[j+7][i]) {
+                                        System.out.println("E ainda há uma oitava repetição");
+                                        salto = 8;
+                                    }
 
-        for (int borracha = 0; borracha <= contaRepeticoes; borracha++) {
-            tabuleiroAuxiliar[linha + borracha][coluna] = 0;
-        }
-    }
-
-    public boolean verificaRepeticaoColunas() {
-
-        boolean repeticaoEncontrada = false;
-        for (int linha = 0; linha < 8; linha++) {
-            for (int coluna = 0; coluna < 6; coluna++) {
-                int contaRepeticoes = 0;
-                int colunaDaDireita = coluna + 1;
-
-                while (colunaDaDireita <= 7 && 
-                        tabuleiro[linha][coluna] == tabuleiro[linha][colunaDaDireita]) {
-                    colunaDaDireita++;
-                    contaRepeticoes++;
+                                }
+                            }
+                        }
+                    }
                 }
-                if (contaRepeticoes >= 2) {
-                    System.out.println("O numero "
-                            + tabuleiro[linha][coluna]
-                            + " repetiu-se " + contaRepeticoes + " vezes "
-                            + " na linha " + linha);
-                    apagaRepeticaoColunas(coluna, linha, contaRepeticoes);
-                    coluna += contaRepeticoes;
-                    repeticaoEncontrada = true;
-                }
+
+                // colocar 3+ zeros no local indicado por i,j ( o numero de zeros é dado pela variável "salto"
+                colocarZerosOndeHaviaRepeticoesColunas(j,i,salto);
+                i += salto;
             }
-        }
-        System.out.println("Repetição encontrada colunas=" + repeticaoEncontrada);
-                        
-        return repeticaoEncontrada;
+        }       
     }
 
-    private void apagaRepeticaoColunas(int coluna, int linha, int contaRepeticoes) {
-
-        for (int borracha = 0; borracha <= contaRepeticoes; borracha++) {
-            tabuleiroAuxiliar[linha][coluna + borracha] = 0;
+    void colocarZerosOndeHaviaRepeticoesLinhas(int j, int i, int salto) {
+        for (int iAux = i; iAux < i + salto; iAux++) {
+            tabuleiroJogo[j][iAux] = 0;
         }
     }
+    
+    void colocarZerosOndeHaviaRepeticoesColunas(int j, int i, int salto) {
+        for (int jAux = j; jAux < j + salto; jAux++) {
+            tabuleiroJogo[jAux][i] = 0;
+        }
+    }
+    
 
-    private void verificaRepeticoes() {
+    /*
+    public static void main(String[] args) {
 
-        verificaRepeticaoLinhas();
-        verificaRepeticaoColunas();
+        LogicaJogo jogo = new LogicaJogo();
+
+        // jogo.preencheTabuleiro();
+        jogo.preencheTabuleiroDeTeste();
+        jogo.mostraTabuleiro();
+        jogo.detetarRepeticoesLinhas();
         
     }
+     */
 }
